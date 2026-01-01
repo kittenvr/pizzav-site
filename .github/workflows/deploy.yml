@@ -1,4 +1,4 @@
-name: Deploy Hugo Site to GitHub Pages
+name: Deploy to Server with Docker
 
 on:
   push:
@@ -7,26 +7,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
-    - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v3
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v1.0.0
       with:
-        hugo-version: 'latest'
-        extended: true
-
-    - name: Build site
-      run: hugo --minify
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
-        cname: pizzav.xyz
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT || '22' }}
+        script: |
+          mkdir -p ~/pizzav-site
+          cd ~/pizzav-site
+          git clone https://github.com/${{ github.repository }} . --depth 1
+          echo "TUNNEL_TOKEN=${{ secrets.TUNNEL_TOKEN }}" > .env
+          echo "DOMAIN=pizzav.xyz" >> .env
+          docker compose down
+          docker compose up -d --build
