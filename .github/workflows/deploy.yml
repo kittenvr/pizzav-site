@@ -1,0 +1,43 @@
+name: Build and Deploy Site
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v3
+      with:
+        hugo-version: 'latest'
+        extended: true
+
+    - name: Build site
+      run: hugo --minify
+
+    # This step will only run if you have SSH deploy set up
+    - name: Deploy via SSH (optional)
+      if: ${{ secrets.SSH_HOST && secrets.SSH_PRIVATE_KEY }}
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || '22' }}
+        source: "public/"
+        target: "/path/to/your/website/directory"
+        strip_components: 1
+
+    # If using GitHub Pages, uncomment these lines and remove the SSH deploy step above
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' && !secrets.SSH_HOST
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        force_orphan: true

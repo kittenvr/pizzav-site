@@ -1,0 +1,7 @@
+baseURL = 'https://pizzav.xyz'
+languageCode = 'en-us'
+title = 'PizzaV site'
+theme = 'hugo-theme-terminal'
+
+[params]
+FullWidthTheme = true
