@@ -1,17 +1,14 @@
-name: Deploy to Server with Docker
+name: Notify Server of Update
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  notify:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Deploy to server via SSH
+    - name: Notify server to rebuild site
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.HOST }}
@@ -19,10 +16,4 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT || '22' }}
         script: |
-          mkdir -p ~/pizzav-site
-          cd ~/pizzav-site
-          git clone https://github.com/${{ github.repository }} . --depth 1
-          echo "TUNNEL_TOKEN=${{ secrets.TUNNEL_TOKEN }}" > .env
-          echo "DOMAIN=pizzav.xyz" >> .env
-          docker compose down
-          docker compose up -d --build
+          touch ~/pizzav-site/rebuild_trigger
