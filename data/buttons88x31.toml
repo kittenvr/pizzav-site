@@ -29,6 +29,11 @@ alt = "the loud"
 link = "https://aliceweidel.gay"
 
 [[buttons]]
+src = "https://restartb.xyz/assets/88x31/Restart.png"
+alt = "restartb"
+link = "https://restartb.xyz"
+
+[[buttons]]
 filename = "bitwarden.gif"
 alt = "bitwarden"
 link = "https://github.com/dani-garcia/vaultwarden"
